@@ -184,6 +184,7 @@ export declare class Dog {
  */
 export declare class Fib extends Iterator<number, void, number> {
   constructor()
+  next(value?: number): IteratorResult<number, void>
 }
 
 /**
@@ -195,6 +196,7 @@ export declare class Fib extends Iterator<number, void, number> {
  */
 export declare class Fib2 extends Iterator<number, void, number> {
   static create(seed: number): Fib2
+  next(value?: number): IteratorResult<number, void>
 }
 
 /**
@@ -208,6 +210,7 @@ export declare class Fib3 extends Iterator<number, void, number> {
   current: number
   nextNum: number
   constructor(current: number, nextNum: number)
+  next(value?: number): IteratorResult<number, void>
 }
 
 /**
@@ -221,6 +224,7 @@ export declare class Fib4 extends Iterator<unknown, void, number> {
   current: number
   nextItem: number
   constructor(current: number, nextItem: number)
+  next(value?: number): IteratorResult<unknown, void>
 }
 
 export declare class GetterSetterWithClosures {
@@ -483,6 +487,55 @@ export declare function chronoNativeDateTimeReturn(): Date | null
 export declare function chronoUtcDateReturn(): Date | null
 
 export declare function chronoUtcDateToMillis(input: Date): number
+
+export interface CompilerAssumptions {
+  ignoreFunctionLength?: boolean
+  noDocumentAll?: boolean
+  objectRestNoSymbols?: boolean
+  pureGetters?: boolean
+  /**
+   * When using public class fields, assume that they don't shadow any getter in the current class,
+   * in its subclasses or in its superclass. Thus, it's safe to assign them rather than using
+   * `Object.defineProperty`.
+   *
+   * For example:
+   *
+   * Input:
+   * ```js
+   * class Test {
+   *   field = 2;
+   *
+   *   static staticField = 3;
+   * }
+   * ```
+   *
+   * When `set_public_class_fields` is `true`, the output will be:
+   * ```js
+   * class Test {
+   *   constructor() {
+   *     this.field = 2;
+   *   }
+   * }
+   * Test.staticField = 3;
+   * ```
+   *
+   * Otherwise, the output will be:
+   * ```js
+   * import _defineProperty from "@oxc-project/runtime/helpers/defineProperty";
+   * class Test {
+   *   constructor() {
+   *     _defineProperty(this, "field", 2);
+   *   }
+   * }
+   * _defineProperty(Test, "staticField", 3);
+   * ```
+   *
+   * NOTE: For TypeScript, if you wanted behavior is equivalent to `useDefineForClassFields: false`, you should
+   * set both `set_public_class_fields` and [`crate::TypeScriptOptions::remove_class_fields_without_initializer`]
+   * to `true`.
+   */
+  setPublicClassFields?: boolean
+}
 
 export declare function concatLatin1(s: string): string
 
